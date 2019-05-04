@@ -1,7 +1,6 @@
 package rTree.model;
 
 import rTree.Config;
-import rTree.model.geometric.IRectangle;
 import rTree.model.geometric.Rectangle;
 import rTree.model.splits.Split;
 
@@ -33,17 +32,17 @@ public class RTree implements Serializable {
     }
 
     public INode getRoot() {
-        return DiskUtils.readFromDisk(rootId);
+        return AbstractNode.readFromDisk(rootId);
     }
 
-    public List<IRectangle> search(Rectangle rectangle) {
+    public List<Rectangle> search(Rectangle rectangle) {
         return searchIn(rootId, rectangle);
     }
 
-    private List<IRectangle> searchIn(int nodeId, Rectangle rectangle) {
+    private List<Rectangle> searchIn(int nodeId, Rectangle rectangle) {
 
-        List<IRectangle> results = new ArrayList<>();
-        INode node = DiskUtils.readFromDisk(nodeId);
+        List<Rectangle> results = new ArrayList<>();
+        INode node = AbstractNode.readFromDisk(nodeId);
         Config.DISK_ACCESSES++;
 
         if (node.getMBR().intersects(rectangle)) {
@@ -77,7 +76,7 @@ public class RTree implements Serializable {
 
     private INode[] insertIn(int nodeId, Rectangle rectangle) {
 
-        INode node = DiskUtils.readFromDisk(nodeId);
+        INode node = AbstractNode.readFromDisk(nodeId);
         Config.DISK_ACCESSES++;
 
         // node is a leaf, we just insert
@@ -91,11 +90,11 @@ public class RTree implements Serializable {
 
             List<Integer> differences = new ArrayList<>();
 
-            List<IRectangle> childMBRs = node.getRectangles();
+            List<Rectangle> childMBRs = node.getRectangles();
 
             // get all new possible MBRs and get how much they would grow
-            for (IRectangle childMBR : childMBRs) {
-                IRectangle newMBR = childMBR.minimumBoundingRectangle(rectangle);
+            for (Rectangle childMBR : childMBRs) {
+                Rectangle newMBR = childMBR.minimumBoundingRectangle(rectangle);
                 differences.add(childMBR.differenceArea(newMBR));
             }
             // get the minimum growth
@@ -108,7 +107,7 @@ public class RTree implements Serializable {
                 // decide by the minimum area
                 List<Integer> areas = new ArrayList<>();
                 for (Integer index : indexesOfMin) {
-                    areas.add(childMBRs.get(index).area());
+                    areas.add(childMBRs.get(index).getArea());
                 }
                 // get the minimum area
                 int minArea = Collections.min(areas);

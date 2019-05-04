@@ -1,7 +1,6 @@
 package rTree.model;
 
 import rTree.Config;
-import rTree.model.geometric.IRectangle;
 import rTree.model.geometric.Rectangle;
 
 import java.util.List;

@@ -34,11 +34,11 @@ public class Rectangle implements Serializable{
         this.width = width;
     }
 
-    double getArea(){
+    public int getArea(){
         return  height*width;
     }
 
-    boolean intersects(Rectangle rectangle){
+    public boolean intersects(Rectangle rectangle){
         return (this.x <= rectangle.x + rectangle.width) &&
                 (this.x + width >= rectangle.x) &&
                 (this.y <= rectangle.y + rectangle.height) &&
@@ -78,7 +78,7 @@ public class Rectangle implements Serializable{
         return new Rectangle(bbX, bbY, bbWidth, bbHeight);
     }
 
-    public double differenceArea(Rectangle rect) {
+    public int differenceArea(Rectangle rect) {
         return Math.abs(this.getArea() - rect.getArea());
     }
 

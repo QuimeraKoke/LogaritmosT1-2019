@@ -1,6 +1,6 @@
 package rTree.model;
 
-import rTree.model.geometric.IRectangle;
+import rTree.model.geometric.Rectangle;
 
 import java.io.Serializable;
 import java.util.List;
@@ -9,19 +9,19 @@ public interface INode extends Serializable {
 
     boolean isLeaf();
 
-    IRectangle getMBR();
+    Rectangle getMBR();
 
     //List<INode> getChildrenIds();
     List<Integer> getChildrenIds();
 
-    List<IRectangle> getRectangles();
+    List<Rectangle> getRectangles();
 
     boolean isOverflow();
 
     //void addNode(INode node);
-    void addNode(int nodeId, IRectangle rectangle);
+    void addNode(int nodeId, Rectangle rectangle);
 
-    void addRectangle(IRectangle rectangle);
+    void addRectangle(Rectangle rectangle);
 
     void updateMBR();
 
