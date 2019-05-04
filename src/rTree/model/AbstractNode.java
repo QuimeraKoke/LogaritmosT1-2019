@@ -9,13 +9,10 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import static rTree.Main.MAX_M;
+import static rTree.Main.MIN_M;
 
-
-public abstract class AbstractNode implements INode {
-	
-	public final static int MAX_M = 160;
-    public final static int MIN_M = (int) (MAX_M * 0.4);
-    public static int DISK_ACCESSES = 0;
+public abstract class AbstractNode {
     
 	public static final String DIR = "data" + File.separator;
 	public static final File FILE = new File(DIR + "id");
