@@ -1,7 +1,6 @@
 package rTree;
 
 import rTree.model.RTree;
-import rTree.model.geometric.IRectangle;
 import rTree.model.geometric.Rectangle;
 import rTree.model.splits.QuadraticSplit;
 
@@ -54,7 +53,7 @@ public class Main {
         List<Rectangle> found = linearRTree.search(rectangles.get(rand.nextInt(rectangles.size())));
         System.out.println(found);
 
-        System.out.println("Acceso promedio a disco: " + ((double) (Config.DISK_ACCESSES) / benchLimit));
+        System.out.println("Acceso promedio a disco: " + ((double) (DISK_ACCESSES) / benchLimit));
         System.out.println("Acceso promedio a disco: " + linearRTree.getRoot().getDiskUsage());
 
         //RTree quadraticRTree = new RTree(new QuadraticSplit());
