@@ -9,6 +9,9 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+
+import rTree.splits.Split;
+
 import static rTree.Main.MAX_M;
 import static rTree.Main.MIN_M;
 
@@ -61,7 +64,7 @@ public abstract class AbstractNode implements Serializable {
         return rectangles.size();
     }
     
-    public boolean isOverflow() {
+    public boolean hasOverflow() {
         return getNElements() > MAX_M;
     }
     
@@ -75,6 +78,7 @@ public abstract class AbstractNode implements Serializable {
     
     public void writeToDisk() {
         try {
+        	//System.out.println("Write id " + id);
             ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(DIR + "n" + id + ".node"));
             out.writeObject(this);
             out.close();
@@ -102,6 +106,7 @@ public abstract class AbstractNode implements Serializable {
                 }
             }
         }
-    }    
+    }
+    public abstract AbstractNode[] split(Split split);
 
 }

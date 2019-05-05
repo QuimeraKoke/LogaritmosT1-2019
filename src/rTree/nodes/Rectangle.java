@@ -6,19 +6,14 @@ import java.util.Random;
 
 public class Rectangle implements Serializable{
 
-    protected int x, y, height, width;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	protected int x, y, height, width;
     private static final int max_vertix = 500000;
     private static final int max_length = 100;
 
-    /*
-         * Rectangle's origin is in the lower-left vertex.
-         *  ______________________________
-         *  |							  |
-         *  |							  |
-         *  |							  |
-         *  O_____________________________|
-         *
-         */
     public Rectangle() {
         Random rand = new Random();
         this.x = rand.nextInt(max_length);
@@ -44,8 +39,6 @@ public class Rectangle implements Serializable{
                 (this.y <= rectangle.y + rectangle.height) &&
                 (this.y + height >= rectangle.y);
     }
-
-
 
     public Rectangle getIntersectionRect(Rectangle rectangle) {
         int upX = x + width;

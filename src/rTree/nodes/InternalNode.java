@@ -3,6 +3,7 @@ package rTree.nodes;
 import java.util.List;
 
 import rTree.Main;
+import rTree.splits.Split;
 
 import static rTree.Main.MAX_M;
 
@@ -49,6 +50,11 @@ public class InternalNode extends AbstractNode {
         childrenIds.add(nodeId);
         rectangles.add(rectMBR);
         mbr = mbr.minimumBoundingRectangle(rectMBR);
+    }
+    
+    @Override
+    public AbstractNode[] split(Split split) {
+        return split.splitInternalNode(this);
     }
 
 }

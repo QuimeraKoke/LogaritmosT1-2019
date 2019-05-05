@@ -1,8 +1,15 @@
 package rTree.nodes;
 
+import rTree.splits.Split;
+
 public class ExternalNode extends AbstractNode {
 
-    public ExternalNode() {
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	public ExternalNode() {
         super();
     }
 
@@ -10,5 +17,10 @@ public class ExternalNode extends AbstractNode {
     public void addRectangle(Rectangle rectangle) {
         rectangles.add(rectangle);
         mbr = mbr.minimumBoundingRectangle(rectangle);
+    }
+    
+    @Override
+    public AbstractNode[] split(Split split) {
+        return split.splitExternalNode(this);
     }
 }
