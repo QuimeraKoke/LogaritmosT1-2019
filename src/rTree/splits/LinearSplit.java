@@ -1,33 +1,37 @@
 package rTree.splits;
 
-import rTree.Config;
-import rTree.nodes.AbstractNode;
-import rTree.nodes.ExternalNode;
-import rTree.nodes.InternalNode;
-import rTree.nodes.Rectangle;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
+import rTree.Main;
+import rTree.nodes.AbstractNode;
+import rTree.nodes.ExternalNode;
+import rTree.nodes.InternalNode;
+import rTree.nodes.Rectangle;
 
 public class LinearSplit implements Split {
 
-    @Override
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	@Override
     public AbstractNode[] split(AbstractNode node) {
         if (node.isExternalNode()) {
-            return splitLeaf((ExternalNode) node);
+            return splitExternalNode((ExternalNode) node);
         }
-        return splitNode((InternalNode) node);
+        return splitInternalNode((InternalNode) node);
     }
 
     // TODO: REFACTOR
     // TODO: REUSE THE INPUT NODE, CLEAR METHOD IN NODE
     @Override
-    public AbstractNode[] splitLeaf(ExternalNode leaf) {
+    public AbstractNode[] splitExternalNode(ExternalNode ExternalNode) {
         // for each dimension (2) we maximize the separation between rectangles
-        List<Rectangle> rectangles = leaf.rectangles;
+        List<Rectangle> rectangles = ExternalNode.rectangles;
         // width
         Rectangle maxLowerSide1 = getRectangleWithMaxLowerSide(rectangles, 1);
         Rectangle minUpperSide1 = getRectangleWithMinUpperSide(rectangles, 1);
@@ -38,18 +42,18 @@ public class LinearSplit implements Split {
         Rectangle minUpperSide2 = getRectangleWithMinUpperSide(rectangles, 2);
         double normalizedSeparation2 = normalizeSeparation(rectangles, maxLowerSide2, minUpperSide2, 2);
 
-        AbstractNode leaf1 = new ExternalNode();
-        AbstractNode leaf2 = new ExternalNode();
+        AbstractNode ExternalNode1 = new ExternalNode();
+        AbstractNode ExternalNode2 = new ExternalNode();
 
         if (normalizedSeparation1 > normalizedSeparation2) {
-            leaf1.addRectangle(maxLowerSide1);
+            ExternalNode1.addRectangle(maxLowerSide1);
             rectangles.remove(maxLowerSide1);
-            leaf2.addRectangle(minUpperSide1);
+            ExternalNode2.addRectangle(minUpperSide1);
             rectangles.remove(minUpperSide1);
         } else {
-            leaf1.addRectangle(maxLowerSide2);
+            ExternalNode1.addRectangle(maxLowerSide2);
             rectangles.remove(maxLowerSide2);
-            leaf2.addRectangle(minUpperSide2);
+            ExternalNode2.addRectangle(minUpperSide2);
             rectangles.remove(minUpperSide2);
         }
 
@@ -57,54 +61,54 @@ public class LinearSplit implements Split {
         while (!rectangles.isEmpty()) {
             Rectangle newRectangle = rectangles.get(rand.nextInt(rectangles.size()));
 
-            int diffExternalNode1 = leaf1.mbr.minimumBoundingRectangle(newRectangle).differenceArea(leaf1.mbr);
-            int diffExternalNode2 = leaf2.mbr.minimumBoundingRectangle(newRectangle).differenceArea(leaf2.mbr);
+            int diffExternalNode1 = ExternalNode1.mbr.minimumBoundingRectangle(newRectangle).differenceArea(ExternalNode1.mbr);
+            int diffExternalNode2 = ExternalNode2.mbr.minimumBoundingRectangle(newRectangle).differenceArea(ExternalNode2.mbr);
 
             if (diffExternalNode1 < diffExternalNode2) {
-                leaf1.addRectangle(newRectangle);
+                ExternalNode1.addRectangle(newRectangle);
             } else if (diffExternalNode1 > diffExternalNode2) {
-                leaf2.addRectangle(newRectangle);
+                ExternalNode2.addRectangle(newRectangle);
             } else { //same differenceArea
                 //decide with min area
-                if (leaf1.mbr.getArea() < leaf2.mbr.getArea())) {
-                    leaf1.addRectangle(newRectangle);
-                } else if (leaf1.mbr.getArea() > leaf2.mbr.getArea()) {
-                    leaf2.addRectangle(newRectangle);
+                if (ExternalNode1.mbr.getArea() < ExternalNode2.mbr.getArea()) {
+                    ExternalNode1.addRectangle(newRectangle);
+                } else if (ExternalNode1.mbr.getArea() > ExternalNode2.mbr.getArea()) {
+                    ExternalNode2.addRectangle(newRectangle);
                 } else { //still a draw, decide by number of MBRs
-                    if (leaf1.rectangles.size() < leaf2.rectangles.size()) {
-                        leaf1.addRectangle(newRectangle);
-                    } else if (leaf1.rectangles.size() > leaf2.rectangles.size()) {
-                        leaf2.addRectangle(newRectangle);
-                    } else { // still draw, choose leaf1 just because
-                        leaf1.addRectangle(newRectangle);
+                    if (ExternalNode1.rectangles.size() < ExternalNode2.rectangles.size()) {
+                        ExternalNode1.addRectangle(newRectangle);
+                    } else if (ExternalNode1.rectangles.size() > ExternalNode2.rectangles.size()) {
+                        ExternalNode2.addRectangle(newRectangle);
+                    } else { // still draw, choose ExternalNode1 just because
+                        ExternalNode1.addRectangle(newRectangle);
                     }
                 }
             }
 
             rectangles.remove(newRectangle);
 
-            // the other leaf have more than MIN_M rectangles already
-            if (leaf1.getRemaining() == rectangles.size()) {
+            // the other ExternalNode have more than MIN_M rectangles already
+            if (ExternalNode1.getRemaining() == rectangles.size()) {
                 for (Rectangle rectangle : rectangles) {
-                    leaf1.addRectangle(rectangle);
+                    ExternalNode1.addRectangle(rectangle);
                 }
                 rectangles.clear();
 
-            } else if (leaf2.getRemaining() == rectangles.size()) {
+            } else if (ExternalNode2.getRemaining() == rectangles.size()) {
                 for (Rectangle rectangle : rectangles) {
-                    leaf2.addRectangle(rectangle);
+                    ExternalNode2.addRectangle(rectangle);
                 }
                 rectangles.clear();
             }
         }
 
         // optimized
-        leaf1.writeToDisk();
-        Config.DISK_ACCESSES++;
-        leaf2.writeToDisk();
-        Config.DISK_ACCESSES++;
+        ExternalNode1.writeToDisk();
+        Main.DISK_ACCESSES++;
+        ExternalNode2.writeToDisk();
+        Main.DISK_ACCESSES++;
 
-        return new AbstractNode[]{leaf1, leaf2};
+        return new AbstractNode[]{ExternalNode1, ExternalNode2};
     }
 
     private Rectangle getRectangleWithMaxLowerSide(List<Rectangle> rectangles, int dimension) {
@@ -142,7 +146,7 @@ public class LinearSplit implements Split {
     }
 
     @Override
-    public AbstractNode[] splitNode(InternalNode node) {
+    public AbstractNode[] splitInternalNode(InternalNode node) {
         List<Integer> childrenIds = node.childrenIds;
         // for each dimension (2) we maximize the separation between rectangles
         List<Rectangle> rectangles = node.rectangles;
@@ -225,9 +229,9 @@ public class LinearSplit implements Split {
         rectangles.clear();
 
         node1.writeToDisk();
-        Config.DISK_ACCESSES++;
+        Main.DISK_ACCESSES++;
         node2.writeToDisk();
-        Config.DISK_ACCESSES++;
+        Main.DISK_ACCESSES++;
 
         return new AbstractNode[]{node1, node2};
     }

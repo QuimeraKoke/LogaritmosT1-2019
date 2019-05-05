@@ -1,8 +1,8 @@
 package rTree.splits;
 
 import rTree.nodes.AbstractNode;
-import rTree.nodes.ExternalNode;
 import rTree.nodes.InternalNode;
+import rTree.nodes.ExternalNode;
 
 import java.io.Serializable;
 
@@ -10,8 +10,8 @@ public interface Split extends Serializable {
 
     AbstractNode[] split(AbstractNode node);
 
-    AbstractNode[] splitLeaf(ExternalNode leaf);
+    AbstractNode[] splitExternalNode(ExternalNode enode);
 
-    AbstractNode[] splitNode(InternalNode node);
+    AbstractNode[] splitInternalNode(InternalNode inode);
 
 }

@@ -1,6 +1,5 @@
 package rTree.splits;
 
-import rTree.Config;
 import rTree.nodes.AbstractNode;
 import rTree.nodes.InternalNode;
 import rTree.nodes.ExternalNode;
@@ -9,18 +8,21 @@ import rTree.nodes.Rectangle;
 import java.util.ArrayList;
 import java.util.List;
 
-import static rTree.Config.MAX_M;
-import static rTree.Config.MIN_M;
+import rTree.Main;
 
-@SuppressWarnings("Duplicates")
 public class QuadraticSplit implements Split {
 
-    @Override
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	@Override
     public AbstractNode[] split(AbstractNode node) {
         if (node.isExternalNode()) {
             return splitExternalNode((ExternalNode) node);
         }
-        return splitNode((InternalNode) node);
+        return splitInternalNode((InternalNode) node);
     }
 
     @Override
@@ -37,7 +39,7 @@ public class QuadraticSplit implements Split {
         rectangles.remove(maxFreeAreaRectanglePair[0]);
         rectangles.remove(maxFreeAreaRectanglePair[1]);
 
-        int threshold = MAX_M - MIN_M + 1;
+        int threshold = Main.MAX_M - Main.MIN_M + 1;
 
         while ((ExternalNode1.getNElements() != threshold) && (ExternalNode2.getNElements() != threshold) && !rectangles.isEmpty()) {
 
@@ -60,7 +62,7 @@ public class QuadraticSplit implements Split {
                 ExternalNode1.addRectangle(newRectangle);
             } else if (diffExternalNode1 > diffExternalNode2) {
                 ExternalNode2.addRectangle(newRectangle);
-            } else { //draw so check by min getArea
+            } else { //draw so check by min area
                 if (ExternalNode1.mbr.getArea() < ExternalNode2.mbr.getArea()) {
                     ExternalNode1.addRectangle(newRectangle);
                 } else if (ExternalNode1.mbr.getArea() > ExternalNode2.mbr.getArea()) {
@@ -91,18 +93,18 @@ public class QuadraticSplit implements Split {
         }
 
         ExternalNode1.writeToDisk();
-        Config.DISK_ACCESSES++;
+        Main.DISK_ACCESSES++;
         ExternalNode2.writeToDisk();
-        Config.DISK_ACCESSES++;
+        Main.DISK_ACCESSES++;
 
         return new AbstractNode[]{ExternalNode1, ExternalNode2};
     }
 
-    private int getMaxDifferenceRectangleIndex(List<Integer> getAreaGrowth1, List<Integer> getAreaGrowth2) {
+    private int getMaxDifferenceRectangleIndex(List<Integer> areaGrowth1, List<Integer> areaGrowth2) {
         int result = 0;
         int maxDiff = 0;
-        for (int i = 0; i < getAreaGrowth1.size(); i++) {
-            int possMaxDiff = Math.abs(getAreaGrowth1.get(i) - getAreaGrowth2.get(i));
+        for (int i = 0; i < areaGrowth1.size(); i++) {
+            int possMaxDiff = Math.abs(areaGrowth1.get(i) - areaGrowth2.get(i));
             if (maxDiff < possMaxDiff) {
                 maxDiff = possMaxDiff;
                 result = i;
@@ -140,7 +142,7 @@ public class QuadraticSplit implements Split {
     }
 
     @Override
-    public AbstractNode[] splitNode(InternalNode node) {
+    public AbstractNode[] splitInternalNode(InternalNode node) {
         List<Rectangle> rectangles = node.rectangles;
         List<Integer> childrenIds = node.childrenIds;
 
@@ -152,7 +154,7 @@ public class QuadraticSplit implements Split {
         node1.addNode(childrenIds.get(rectangles.indexOf(maxFreeAreaRectanglePair[0])), maxFreeAreaRectanglePair[0]);
         node2.addNode(childrenIds.get(rectangles.indexOf(maxFreeAreaRectanglePair[1])), maxFreeAreaRectanglePair[1]);
 
-        int threshold = MAX_M - MIN_M + 1;
+        int threshold = Main.MAX_M - Main.MIN_M + 1;
 
         while ((node1.getNElements() != threshold) && (node2.getNElements() != threshold) && !rectangles.isEmpty()) {
 
@@ -176,7 +178,7 @@ public class QuadraticSplit implements Split {
                 node1.addNode(childrenIds.get(index), newRectangle);
             } else if (diffExternalNode1 > diffExternalNode2) {
                 node2.addNode(childrenIds.get(index), newRectangle);
-            } else { //draw so check by min getArea
+            } else { //draw so check by min area
                 if (node1.mbr.getArea() < node2.mbr.getArea()) {
                     node1.addNode(childrenIds.get(index), newRectangle);
                 } else if (node1.mbr.getArea() > node2.mbr.getArea()) {
@@ -210,9 +212,9 @@ public class QuadraticSplit implements Split {
         rectangles.clear();
 
         node1.writeToDisk();
-        Config.DISK_ACCESSES++;
+        Main.DISK_ACCESSES++;
         node2.writeToDisk();
-        Config.DISK_ACCESSES++;
+        Main.DISK_ACCESSES++;
 
         return new AbstractNode[]{node1, node2};
     }
