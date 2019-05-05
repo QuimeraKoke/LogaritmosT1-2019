@@ -1,9 +1,13 @@
 package rTree;
 
+import rTree.nodes.AbstractNode;
 import rTree.nodes.Rectangle;
 import rTree.splits.LinearSplit;
 import rTree.splits.QuadraticSplit;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -12,6 +16,9 @@ public class Main {
     public final static int MAX_M = 160;
     public final static int MIN_M = (int) (MAX_M * 0.4);
     public static int DISK_ACCESSES = 0;
+    
+    public static final String DIR = "data" + File.separator;
+	public static final File FILE = new File(DIR + "id");
 
     private static final int N = (int) Math.pow(2, 10);
 
@@ -42,7 +49,6 @@ public class Main {
         // Warm up with N/10
         for (int i = 0; i < (int) N / 10; i++) {
             linearRTree.insert(rectangles.get(i));
-            System.out.println(i);
         }
         linearRTree.clear();
         
@@ -112,5 +118,16 @@ public class Main {
         System.out.println("N° total de accesos a disco: " + DISK_ACCESSES);
         System.out.println("Tiempo total de búsquedas con QuadraticSplit: " + (endTime - startTime) + "milisegundos");
 
+    }
+    
+    public static AbstractNode readFromDisk(int id) {
+        try {
+            ObjectInputStream in = new ObjectInputStream(new FileInputStream(DIR + "n" + id + ".node"));
+            return (AbstractNode)in.readObject();
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.exit(1);
+            return null;
+        }
     }
 }
