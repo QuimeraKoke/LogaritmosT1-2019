@@ -1,6 +1,5 @@
-package rTree.model;
+package rTree.nodes;
 
-import rTree.model.geometric.Rectangle;
 import java.util.List;
 
 public class InternalNode extends AbstractNode {

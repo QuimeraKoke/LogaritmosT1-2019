@@ -1,4 +1,4 @@
-package rTree.model.splits;
+package rTree.splits;
 
 import rTree.model.INode;
 import rTree.model.InnerNode;

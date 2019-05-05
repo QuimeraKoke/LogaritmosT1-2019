@@ -1,8 +1,9 @@
-package rTree.model;
+package rTree;
 
 import rTree.Config;
-import rTree.model.geometric.Rectangle;
-import rTree.model.splits.Split;
+import rTree.nodes.AbstractNode;
+import rTree.nodes.Rectangle;
+import rTree.splits.Split;
 
 import java.io.File;
 import java.io.Serializable;

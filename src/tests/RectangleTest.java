@@ -2,7 +2,7 @@ package tests;
 
 import org.junit.Before;
 import org.junit.Test;
-import rTree.model.geometric.Rectangle;
+import rTree.nodes.Rectangle;
 
 import static org.junit.Assert.assertTrue;
 

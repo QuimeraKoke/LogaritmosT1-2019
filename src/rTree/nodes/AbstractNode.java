@@ -1,6 +1,5 @@
-package rTree.model;
+package rTree.nodes;
 
-import rTree.model.geometric.Rectangle;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;

@@ -2,10 +2,10 @@ package tests;
 
 import org.junit.Before;
 import org.junit.Test;
-import rTree.model.*;
-import rTree.model.geometric.Rectangle;
-import rTree.model.splits.LinearSplit;
-import rTree.model.splits.QuadraticSplit;
+import rTree.RTree;
+import rTree.nodes.Rectangle;
+import rTree.splits.LinearSplit;
+import rTree.splits.QuadraticSplit;
 
 import java.util.ArrayList;
 import java.util.List;

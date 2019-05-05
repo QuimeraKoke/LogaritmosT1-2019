@@ -1,4 +1,4 @@
-package rTree.model.geometric;
+package rTree.nodes;
 
 import java.io.Serializable;
 import java.util.Objects;

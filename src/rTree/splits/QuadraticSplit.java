@@ -1,10 +1,10 @@
-package rTree.model.splits;
+package rTree.splits;
 
 import rTree.Config;
 import rTree.model.INode;
-import rTree.model.InternalNode;
-import rTree.model.ExternalNode;
-import rTree.model.geometric.Rectangle;
+import rTree.nodes.InternalNode;
+import rTree.nodes.ExternalNode;
+import rTree.nodes.Rectangle;
 
 import java.util.ArrayList;
 import java.util.List;

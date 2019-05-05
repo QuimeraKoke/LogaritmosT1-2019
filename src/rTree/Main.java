@@ -1,8 +1,7 @@
 package rTree;
 
-import rTree.model.RTree;
-import rTree.model.geometric.Rectangle;
-import rTree.model.splits.QuadraticSplit;
+import rTree.nodes.Rectangle;
+import rTree.splits.QuadraticSplit;
 
 import java.util.ArrayList;
 import java.util.List;

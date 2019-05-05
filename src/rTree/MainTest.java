@@ -1,10 +1,9 @@
 package rTree;
 
 
-import rTree.model.RTree;
-import rTree.model.geometric.Rectangle;
-import rTree.model.splits.QuadraticSplit;
-import rTree.model.splits.LinearSplit;
+import rTree.nodes.Rectangle;
+import rTree.splits.QuadraticSplit;
+import rTree.splits.LinearSplit;
 
 import java.io.IOException;
 import java.util.ArrayList;

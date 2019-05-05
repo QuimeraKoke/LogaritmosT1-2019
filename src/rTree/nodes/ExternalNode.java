@@ -1,6 +1,4 @@
-package rTree.model;
-
-import rTree.model.geometric.Rectangle;
+package rTree.nodes;
 
 public class ExternalNode extends AbstractNode {
 
