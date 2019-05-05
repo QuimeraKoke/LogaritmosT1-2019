@@ -1,6 +1,5 @@
 package rTree;
 
-import rTree.Config;
 import rTree.nodes.AbstractNode;
 import rTree.nodes.ExternalNode;
 import rTree.nodes.InternalNode;
@@ -11,9 +10,15 @@ import java.io.File;
 import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
+import rTree.Main;
 
 public class RTree implements Serializable {
-    private Split heuristic;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	private Split heuristic;
 
     private int rootId;
     public static final String DIR = "data" + File.separator;
@@ -21,17 +26,17 @@ public class RTree implements Serializable {
 
     public RTree(Split heuristic) {
         AbstractNode root = new ExternalNode();
+        rootId = root.newId();
         this.heuristic = heuristic;
-        rootId = root.getId();
         root.writeToDisk();
-        Config.DISK_ACCESSES++;
+        Main.DISK_ACCESSES++;
     }
 
     public RTree(Split heuristic, AbstractNode root) {
-        rootId = root.getId();
+        rootId = root.newId();
         this.heuristic = heuristic;
         root.writeToDisk();
-        Config.DISK_ACCESSES++;
+        Main.DISK_ACCESSES++;
     }
 
     public AbstractNode getRoot() {
@@ -46,7 +51,7 @@ public class RTree implements Serializable {
 
         List<Rectangle> results = new ArrayList<>();
         AbstractNode node = AbstractNode.readFromDisk(nodeId);
-        Config.DISK_ACCESSES++;
+        Main.DISK_ACCESSES++;
 
         if (node.mbr.intersects(rectangle)) {
             if (node.isExternalNode()) {
@@ -67,20 +72,20 @@ public class RTree implements Serializable {
 
         AbstractNode[] newNodes = insertIn(rootId, rectangle);
         if (newNodes[1] == null) {
-            rootId = newNodes[0].getId();
+            rootId = newNodes[0].id;
         } else {
-            AbstractNode newRoot = new InternalNode(new ArrayList<>(Arrays.asList(newNodes[0].getId(), newNodes[1].getId())),
+            AbstractNode newRoot = new InternalNode(new ArrayList<>(Arrays.asList(newNodes[0].id, newNodes[1].id)),
                     new ArrayList<>(Arrays.asList(newNodes[0].mbr , newNodes[1].mbr)));
-            rootId = newRoot.getId();
+            rootId = newRoot.id;
             newRoot.writeToDisk();
-            Config.DISK_ACCESSES++;
+            Main.DISK_ACCESSES++;
         }
     }
 
     private AbstractNode[] insertIn(int nodeId, Rectangle rectangle) {
 
         AbstractNode node = AbstractNode.readFromDisk(nodeId);
-        Config.DISK_ACCESSES++;
+        Main.DISK_ACCESSES++;
 
         // node is a ExternalNode, we just insert
         if (node.isExternalNode()) {
@@ -143,11 +148,11 @@ public class RTree implements Serializable {
             }
 
             // update the changes
-            node.childrenIds.set(originalIndex, theNewNodes[0].getId());
+            node.childrenIds.set(originalIndex, theNewNodes[0].id);
             node.rectangles.set(originalIndex, theNewNodes[0].mbr);
             //check if there is a new node
             if (theNewNodes[1] != null) {
-                node.addNode(theNewNodes[1].getId(), theNewNodes[1].mbr);
+                node.addNode(theNewNodes[1].id, theNewNodes[1].mbr);
             }
 
             // update the MBR
@@ -155,7 +160,7 @@ public class RTree implements Serializable {
         }
 
         node.writeToDisk();
-        Config.DISK_ACCESSES++;
+        Main.DISK_ACCESSES++;
 
         // TODO: FIX PLS
         AbstractNode[] newNodes = new AbstractNode[]{node, null};
@@ -169,7 +174,7 @@ public class RTree implements Serializable {
 
     public void clear() {
         AbstractNode root = new ExternalNode();
-        rootId = root.getId();
+        rootId = root.id;
         root.writeToDisk();
     }
 

@@ -1,6 +1,7 @@
 package rTree;
 
 import rTree.nodes.Rectangle;
+import rTree.splits.LinearSplit;
 import rTree.splits.QuadraticSplit;
 
 import java.util.ArrayList;
@@ -12,50 +13,104 @@ public class Main {
     public final static int MIN_M = (int) (MAX_M * 0.4);
     public static int DISK_ACCESSES = 0;
 
-    private static final int RANGE_ORIGIN = 500000;
-    private static final int RANGE_LENGTH = 100;
-
-    public static Rectangle randomRectangle() {
-        Random rand = new Random();
-        return new Rectangle(rand.nextInt(RANGE_ORIGIN), rand.nextInt(RANGE_ORIGIN),
-                rand.nextInt(RANGE_LENGTH) + 1, rand.nextInt(RANGE_LENGTH) + 1);
-    }
+    private static final int N = (int) Math.pow(2, 10);
 
     public static void main(String[] args) {
-        /*
-        Experiments here
-         */
-        int benchLimit = (int) Math.pow(2, 25);
-
+    	
+        RTree linearRTree = new RTree(new LinearSplit());
+        RTree quadraticRTree = new RTree(new QuadraticSplit());
+        long startTime;
+        long endTime;
         List<Rectangle> rectangles = new ArrayList<>();
-        for (int i = 0; i < benchLimit; i++) {
-            rectangles.add(randomRectangle());
+        List<Rectangle> randomrectangles = new ArrayList<>();
+        Random rand = new Random();
+        
+    	// Random rectangles (size N)
+        for (int i = 0; i < N; i++) {
+            rectangles.add(new Rectangle());
         }
-        System.out.println(rectangles.size());
-
-        RTree linearRTree = new RTree(new QuadraticSplit());
-        // warm up
-        for (int i = 0; i < (int) (benchLimit * 0.1); i++) {
+        
+        // Random selection of rectangles for search (size N/10)
+        for (int i = 0; i < (int) N / 10; i++) {
+        	randomrectangles.add(rectangles.get(rand.nextInt(rectangles.size())));            
+        }
+        
+        /* 
+         * Linear Split 
+         * 
+         */
+        // Warm up with N/10
+        for (int i = 0; i < (int) N / 10; i++) {
             linearRTree.insert(rectangles.get(i));
+            System.out.println(i);
         }
         linearRTree.clear();
-
-        long startTime = System.currentTimeMillis();
+        
+        // Insertion
+        startTime = System.currentTimeMillis();
         for (Rectangle rectangle : rectangles) {
             linearRTree.insert(rectangle);
         }
-        long endTime = System.currentTimeMillis();
-        System.out.println("Total time: " + (endTime - startTime) + "ms");
-        System.out.println("Average insertion time: " + ((double) (endTime - startTime) / rectangles.size()) + "ms");
-
-        Random rand = new Random();
-        List<Rectangle> found = linearRTree.search(rectangles.get(rand.nextInt(rectangles.size())));
-        System.out.println(found);
-
-        System.out.println("Acceso promedio a disco: " + ((double) (DISK_ACCESSES) / benchLimit));
-        System.out.println("Acceso promedio a disco: " + linearRTree.getRoot().getDiskUsage());
-
-        //RTree quadraticRTree = new RTree(new QuadraticSplit());
+        endTime = System.currentTimeMillis();
+     
+        System.out.println("Tiempo promedio por inserción con LinearSplit: " + ((endTime - startTime) / (rectangles.size() * 1.0)) + "milisegundos");
+        System.out.println("N° total de accesos a disco: " + DISK_ACCESSES);
+        System.out.println("Tiempo total de construcción por inserción con LinearSplit: " + (endTime - startTime) + "milisegundos");
+        System.out.println("Espacio utilizado en disco: " + linearRTree.getRoot().getDiskUsage());
+        System.out.println("Porcentaje de llenado de disco:");
+        
+        DISK_ACCESSES = 0;
+        
+        // Search
+        startTime = System.currentTimeMillis();
+        for (Rectangle rrectangle : randomrectangles) {
+        	@SuppressWarnings("unused")
+			List<Rectangle> resultrect = linearRTree.search(rrectangle);        
+        }
+        endTime = System.currentTimeMillis();
+        
+        System.out.println("Tiempo promedio por búsqueda con LinearSplit: " + ((endTime - startTime) / (N / 10)) + "milisegundos");
+        System.out.println("N° total de accesos a disco: " + DISK_ACCESSES);
+        System.out.println("Tiempo total de búsquedas con LinearSplit: " + (endTime - startTime) + "milisegundos");
+        
+        DISK_ACCESSES = 0;
+        
+        /* 
+         * Quadratic Split 
+         * 
+         */
+        // Warm up with N/10
+        for (int i = 0; i < (int) N / 10; i++) {
+            quadraticRTree.insert(rectangles.get(i));
+        }
+        quadraticRTree.clear();
+        
+        // Insertion
+        startTime = System.currentTimeMillis();
+        for (Rectangle rectangle : rectangles) {
+            quadraticRTree.insert(rectangle);
+        }
+        endTime = System.currentTimeMillis();
+     
+        System.out.println("Tiempo promedio por inserción con QuadraticSplit: " + ((endTime - startTime) / (rectangles.size() * 1.0)) + "milisegundos");
+        System.out.println("N° total de accesos a disco: " + DISK_ACCESSES);
+        System.out.println("Tiempo total de construcción por inserción con QuadraticSplit: " + (endTime - startTime) + "milisegundos");
+        System.out.println("Espacio utilizado en disco: " + quadraticRTree.getRoot().getDiskUsage());
+        System.out.println("Porcentaje de llenado de disco:");
+        
+        DISK_ACCESSES = 0;
+        
+        // Search
+        startTime = System.currentTimeMillis();
+        for (Rectangle rrectangle : randomrectangles) {
+        	@SuppressWarnings("unused")
+			List<Rectangle> resultrect = quadraticRTree.search(rrectangle);        
+        }
+        endTime = System.currentTimeMillis();
+        
+        System.out.println("Tiempo promedio por búsqueda con QuadraticSplit: " + ((endTime - startTime) / (N / 10)) + "milisegundos");
+        System.out.println("N° total de accesos a disco: " + DISK_ACCESSES);
+        System.out.println("Tiempo total de búsquedas con QuadraticSplit: " + (endTime - startTime) + "milisegundos");
 
     }
 }
