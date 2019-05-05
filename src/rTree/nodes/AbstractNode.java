@@ -17,9 +17,9 @@ public abstract class AbstractNode {
 	public static final File FILE = new File(DIR + "id");
 	
 	int id;
-	Rectangle mbr;
-    List<Integer> childrenIds;
-    List<Rectangle> rectangles;
+	public Rectangle mbr;
+    public List<Integer> childrenIds;
+    public List<Rectangle> rectangles;
     
     AbstractNode() {
         this(new ArrayList<>(), new ArrayList<>());
@@ -30,6 +30,10 @@ public abstract class AbstractNode {
         this.childrenIds = children;
         this.rectangles = rectangles;
         updateMBR();
+    }
+
+    public int getId(){
+        return id;
     }
 
     public static int newId() {

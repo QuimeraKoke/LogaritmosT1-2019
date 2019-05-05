@@ -2,6 +2,8 @@ package rTree;
 
 import rTree.Config;
 import rTree.nodes.AbstractNode;
+import rTree.nodes.ExternalNode;
+import rTree.nodes.InternalNode;
 import rTree.nodes.Rectangle;
 import rTree.splits.Split;
 
@@ -18,14 +20,14 @@ public class RTree implements Serializable {
 
 
     public RTree(Split heuristic) {
-        INode root = new Leaf();
+        AbstractNode root = new ExternalNode();
         this.heuristic = heuristic;
         rootId = root.getId();
         root.writeToDisk();
         Config.DISK_ACCESSES++;
     }
 
-    public RTree(Split heuristic, INode root) {
+    public RTree(Split heuristic, AbstractNode root) {
         rootId = root.getId();
         this.heuristic = heuristic;
         root.writeToDisk();
@@ -43,16 +45,16 @@ public class RTree implements Serializable {
     private List<Rectangle> searchIn(int nodeId, Rectangle rectangle) {
 
         List<Rectangle> results = new ArrayList<>();
-        INode node = AbstractNode.readFromDisk(nodeId);
+        AbstractNode node = AbstractNode.readFromDisk(nodeId);
         Config.DISK_ACCESSES++;
 
-        if (node.getMBR().intersects(rectangle)) {
-            if (node.isLeaf()) {
-                return node.getRectangles().stream().
+        if (node.mbr.intersects(rectangle)) {
+            if (node.isExternalNode()) {
+                return node.rectangles.stream().
                         filter(rect -> rect.intersects(rectangle)).
                         collect(Collectors.toList());
             } else {
-                for (Integer childId : node.getChildrenIds()) {
+                for (Integer childId : node.childrenIds) {
                     results.addAll(searchIn(childId, rectangle));
                 }
             }
@@ -63,35 +65,35 @@ public class RTree implements Serializable {
 
     public void insert(Rectangle rectangle) {
 
-        INode[] newNodes = insertIn(rootId, rectangle);
+        AbstractNode[] newNodes = insertIn(rootId, rectangle);
         if (newNodes[1] == null) {
             rootId = newNodes[0].getId();
         } else {
-            INode newRoot = new InnerNode(new ArrayList<>(Arrays.asList(newNodes[0].getId(), newNodes[1].getId())),
-                    new ArrayList<>(Arrays.asList(newNodes[0].getMBR(), newNodes[1].getMBR())));
+            AbstractNode newRoot = new InternalNode(new ArrayList<>(Arrays.asList(newNodes[0].getId(), newNodes[1].getId())),
+                    new ArrayList<>(Arrays.asList(newNodes[0].mbr , newNodes[1].mbr)));
             rootId = newRoot.getId();
             newRoot.writeToDisk();
             Config.DISK_ACCESSES++;
         }
     }
 
-    private INode[] insertIn(int nodeId, Rectangle rectangle) {
+    private AbstractNode[] insertIn(int nodeId, Rectangle rectangle) {
 
-        INode node = AbstractNode.readFromDisk(nodeId);
+        AbstractNode node = AbstractNode.readFromDisk(nodeId);
         Config.DISK_ACCESSES++;
 
-        // node is a leaf, we just insert
-        if (node.isLeaf()) {
+        // node is a ExternalNode, we just insert
+        if (node.isExternalNode()) {
             node.addRectangle(rectangle);
 
         } else {
 
             int originalIndex;
-            INode[] theNewNodes;
+            AbstractNode[] theNewNodes;
 
             List<Integer> differences = new ArrayList<>();
 
-            List<Rectangle> childMBRs = node.getRectangles();
+            List<Rectangle> childMBRs = node.rectangles;
 
             // get all new possible MBRs and get how much they would grow
             for (Rectangle childMBR : childMBRs) {
@@ -122,30 +124,30 @@ public class RTree implements Serializable {
                     int randomIndex = rand.nextInt(indexesOfMinArea.size());
 
                     originalIndex = indexesOfMin.get(indexesOfMinArea.get(randomIndex));
-                    //newNodeId = insertIn(node.getChildrenIds().get(originalIndex), rectangle);
-                    theNewNodes = insertIn(node.getChildrenIds().get(originalIndex), rectangle);
+                    //newNodeId = insertIn(node.childrenIds.get(originalIndex), rectangle);
+                    theNewNodes = insertIn(node.childrenIds.get(originalIndex), rectangle);
 
                 } else { //only one min area
                     // get the original index
                     originalIndex = indexesOfMin.get(indexesOfMinArea.get(0));
-                    //newNodeId = insertIn(node.getChildrenIds().get(originalIndex), rectangle);
-                    theNewNodes = insertIn(node.getChildrenIds().get(originalIndex), rectangle);
+                    //newNodeId = insertIn(node.childrenIds.get(originalIndex), rectangle);
+                    theNewNodes = insertIn(node.childrenIds.get(originalIndex), rectangle);
                 }
 
             } else { //only one minimum
                 // override the old node
                 originalIndex = indexesOfMin.get(0);
-                //newNodeId = insertIn(node.getChildrenIds().get(originalIndex), rectangle);
-                theNewNodes = insertIn(node.getChildrenIds().get(originalIndex), rectangle);
+                //newNodeId = insertIn(node.childrenIds.get(originalIndex), rectangle);
+                theNewNodes = insertIn(node.childrenIds.get(originalIndex), rectangle);
 
             }
 
             // update the changes
-            node.getChildrenIds().set(originalIndex, theNewNodes[0].getId());
-            node.getRectangles().set(originalIndex, theNewNodes[0].getMBR());
+            node.childrenIds.set(originalIndex, theNewNodes[0].getId());
+            node.rectangles.set(originalIndex, theNewNodes[0].mbr);
             //check if there is a new node
             if (theNewNodes[1] != null) {
-                node.addNode(theNewNodes[1].getId(), theNewNodes[1].getMBR());
+                node.addNode(theNewNodes[1].getId(), theNewNodes[1].mbr);
             }
 
             // update the MBR
@@ -156,7 +158,7 @@ public class RTree implements Serializable {
         Config.DISK_ACCESSES++;
 
         // TODO: FIX PLS
-        INode[] newNodes = new INode[]{node, null};
+        AbstractNode[] newNodes = new AbstractNode[]{node, null};
         // check if overflow
         if (node.isOverflow()) {
             newNodes = heuristic.split(node);
@@ -166,7 +168,7 @@ public class RTree implements Serializable {
     }
 
     public void clear() {
-        INode root = new Leaf();
+        AbstractNode root = new ExternalNode();
         rootId = root.getId();
         root.writeToDisk();
     }

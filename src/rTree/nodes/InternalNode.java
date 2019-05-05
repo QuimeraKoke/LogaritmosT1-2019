@@ -2,6 +2,8 @@ package rTree.nodes;
 
 import java.util.List;
 
+import rTree.Config;
+
 public class InternalNode extends AbstractNode {
 
 	public InternalNode() {
@@ -24,7 +26,7 @@ public class InternalNode extends AbstractNode {
     
     @Override
     public double[] getDiskUsage() {
-        double nodeP = (double) (childrenIds.size()) / MAX_M;
+        double nodeP = (double) (childrenIds.size()) / Config.MAX_M;
         double totalNodes = (double) childrenIds.size();
         for (Integer id : childrenIds) {
             AbstractNode child = readFromDisk(id);

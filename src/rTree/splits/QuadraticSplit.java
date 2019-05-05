@@ -1,7 +1,7 @@
 package rTree.splits;
 
 import rTree.Config;
-import rTree.model.INode;
+import rTree.nodes.AbstractNode;
 import rTree.nodes.InternalNode;
 import rTree.nodes.ExternalNode;
 import rTree.nodes.Rectangle;
@@ -16,7 +16,7 @@ import static rTree.Config.MIN_M;
 public class QuadraticSplit implements Split {
 
     @Override
-    public INode[] split(INode node) {
+    public AbstractNode[] split(AbstractNode node) {
         if (node.isExternalNode()) {
             return splitExternalNode((ExternalNode) node);
         }
@@ -24,13 +24,13 @@ public class QuadraticSplit implements Split {
     }
 
     @Override
-    public INode[] splitExternalNode(ExternalNode ExternalNode) {
-        List<Rectangle> rectangles = ExternalNode.getRectangles();
+    public AbstractNode[] splitExternalNode(ExternalNode ExternalNode) {
+        List<Rectangle> rectangles = ExternalNode.rectangles;
 
         Rectangle[] maxFreeAreaRectanglePair = getMaxFreeArea(rectangles);
 
-        INode ExternalNode1 = new ExternalNode();
-        INode ExternalNode2 = new ExternalNode();
+        AbstractNode ExternalNode1 = new ExternalNode();
+        AbstractNode ExternalNode2 = new ExternalNode();
 
         ExternalNode1.addRectangle(maxFreeAreaRectanglePair[0]);
         ExternalNode2.addRectangle(maxFreeAreaRectanglePair[1]);
@@ -43,32 +43,32 @@ public class QuadraticSplit implements Split {
 
             List<Integer> d1 = new ArrayList<>();
             for (Rectangle rectangle : rectangles) {
-                d1.add(ExternalNode1.getMBR().differenceArea(ExternalNode1.getMBR().minimumBoundingRectangle(rectangle)));
+                d1.add(ExternalNode1.mbr.differenceArea(ExternalNode1.mbr.minimumBoundingRectangle(rectangle)));
             }
 
             List<Integer> d2 = new ArrayList<>();
             for (Rectangle rectangle : rectangles) {
-                d2.add(ExternalNode2.getMBR().differenceArea(ExternalNode2.getMBR().minimumBoundingRectangle(rectangle)));
+                d2.add(ExternalNode2.mbr.differenceArea(ExternalNode2.mbr.minimumBoundingRectangle(rectangle)));
             }
 
             Rectangle newRectangle = rectangles.get(getMaxDifferenceRectangleIndex(d1, d2));
 
-            int diffExternalNode1 = ExternalNode1.getMBR().differenceArea(ExternalNode1.getMBR().minimumBoundingRectangle(newRectangle));
-            int diffExternalNode2 = ExternalNode2.getMBR().differenceArea(ExternalNode2.getMBR().minimumBoundingRectangle(newRectangle));
+            int diffExternalNode1 = ExternalNode1.mbr.differenceArea(ExternalNode1.mbr.minimumBoundingRectangle(newRectangle));
+            int diffExternalNode2 = ExternalNode2.mbr.differenceArea(ExternalNode2.mbr.minimumBoundingRectangle(newRectangle));
 
             if (diffExternalNode1 < diffExternalNode2) {
                 ExternalNode1.addRectangle(newRectangle);
             } else if (diffExternalNode1 > diffExternalNode2) {
                 ExternalNode2.addRectangle(newRectangle);
-            } else { //draw so check by min area
-                if (ExternalNode1.getMBR().area() < ExternalNode2.getMBR().area()) {
+            } else { //draw so check by min getArea
+                if (ExternalNode1.mbr.getArea() < ExternalNode2.mbr.getArea()) {
                     ExternalNode1.addRectangle(newRectangle);
-                } else if (ExternalNode1.getMBR().area() > ExternalNode2.getMBR().area()) {
+                } else if (ExternalNode1.mbr.getArea() > ExternalNode2.mbr.getArea()) {
                     ExternalNode2.addRectangle(newRectangle);
                 } else { //draw so check by min number of MBRs
-                    if (ExternalNode1.getRectangles().size() < ExternalNode2.getRectangles().size()) {
+                    if (ExternalNode1.rectangles.size() < ExternalNode2.rectangles.size()) {
                         ExternalNode1.addRectangle(newRectangle);
-                    } else if (ExternalNode1.getRectangles().size() > ExternalNode2.getRectangles().size()) {
+                    } else if (ExternalNode1.rectangles.size() > ExternalNode2.rectangles.size()) {
                         ExternalNode2.addRectangle(newRectangle);
                     } else { //draw so choose ExternalNode1 just because
                         ExternalNode1.addRectangle(newRectangle);
@@ -80,7 +80,7 @@ public class QuadraticSplit implements Split {
 
         }
         // one node has M-m+1
-        if (ExternalNode1.getRectangles().size() == threshold) {
+        if (ExternalNode1.rectangles.size() == threshold) {
             for (Rectangle rectangle : rectangles) {
                 ExternalNode2.addRectangle(rectangle);
             }
@@ -95,14 +95,14 @@ public class QuadraticSplit implements Split {
         ExternalNode2.writeToDisk();
         Config.DISK_ACCESSES++;
 
-        return new INode[]{ExternalNode1, ExternalNode2};
+        return new AbstractNode[]{ExternalNode1, ExternalNode2};
     }
 
-    private int getMaxDifferenceRectangleIndex(List<Integer> areaGrowth1, List<Integer> areaGrowth2) {
+    private int getMaxDifferenceRectangleIndex(List<Integer> getAreaGrowth1, List<Integer> getAreaGrowth2) {
         int result = 0;
         int maxDiff = 0;
-        for (int i = 0; i < areaGrowth1.size(); i++) {
-            int possMaxDiff = Math.abs(areaGrowth1.get(i) - areaGrowth2.get(i));
+        for (int i = 0; i < getAreaGrowth1.size(); i++) {
+            int possMaxDiff = Math.abs(getAreaGrowth1.get(i) - getAreaGrowth2.get(i));
             if (maxDiff < possMaxDiff) {
                 maxDiff = possMaxDiff;
                 result = i;
@@ -121,8 +121,8 @@ public class QuadraticSplit implements Split {
             int freeArea = 0;
             for (int j = i + 1; j < rectangles.size(); j++) {
                 Rectangle candidateMBR = rectangles.get(i).minimumBoundingRectangle(rectangles.get(j));
-                int candidateFreeArea = candidateMBR.area() - rectangles.get(i).area() - rectangles.get(j).area() +
-                        rectangles.get(i).getIntersectionRect(rectangles.get(j)).area();
+                int candidateFreeArea = candidateMBR.getArea() - rectangles.get(i).getArea() - rectangles.get(j).getArea() +
+                        rectangles.get(i).getIntersectionRect(rectangles.get(j)).getArea();
                 if (freeArea < candidateFreeArea) {
                     freeArea = candidateFreeArea;
                     rect2Index = j;
@@ -140,14 +140,14 @@ public class QuadraticSplit implements Split {
     }
 
     @Override
-    public INode[] splitNode(InternalNode node) {
-        List<Rectangle> rectangles = node.getRectangles();
-        List<Integer> childrenIds = node.getChildrenIds();
+    public AbstractNode[] splitNode(InternalNode node) {
+        List<Rectangle> rectangles = node.rectangles;
+        List<Integer> childrenIds = node.childrenIds;
 
         Rectangle[] maxFreeAreaRectanglePair = getMaxFreeArea(rectangles);
 
-        INode node1 = new InternalNode();
-        INode node2 = new InternalNode();
+        AbstractNode node1 = new InternalNode();
+        AbstractNode node2 = new InternalNode();
 
         node1.addNode(childrenIds.get(rectangles.indexOf(maxFreeAreaRectanglePair[0])), maxFreeAreaRectanglePair[0]);
         node2.addNode(childrenIds.get(rectangles.indexOf(maxFreeAreaRectanglePair[1])), maxFreeAreaRectanglePair[1]);
@@ -158,33 +158,33 @@ public class QuadraticSplit implements Split {
 
             List<Integer> d1 = new ArrayList<>();
             for (Rectangle rectangle : rectangles) {
-                d1.add(node1.getMBR().differenceArea(node1.getMBR().minimumBoundingRectangle(rectangle)));
+                d1.add(node1.mbr.differenceArea(node1.mbr.minimumBoundingRectangle(rectangle)));
             }
 
             List<Integer> d2 = new ArrayList<>();
             for (Rectangle rectangle : rectangles) {
-                d2.add(node2.getMBR().differenceArea(node2.getMBR().minimumBoundingRectangle(rectangle)));
+                d2.add(node2.mbr.differenceArea(node2.mbr.minimumBoundingRectangle(rectangle)));
             }
 
             Rectangle newRectangle = rectangles.get(getMaxDifferenceRectangleIndex(d1, d2));
 
-            int diffExternalNode1 = node1.getMBR().differenceArea(node1.getMBR().minimumBoundingRectangle(newRectangle));
-            int diffExternalNode2 = node2.getMBR().differenceArea(node2.getMBR().minimumBoundingRectangle(newRectangle));
+            int diffExternalNode1 = node1.mbr.differenceArea(node1.mbr.minimumBoundingRectangle(newRectangle));
+            int diffExternalNode2 = node2.mbr.differenceArea(node2.mbr.minimumBoundingRectangle(newRectangle));
             int index = rectangles.indexOf(newRectangle);
 
             if (diffExternalNode1 < diffExternalNode2) {
                 node1.addNode(childrenIds.get(index), newRectangle);
             } else if (diffExternalNode1 > diffExternalNode2) {
                 node2.addNode(childrenIds.get(index), newRectangle);
-            } else { //draw so check by min area
-                if (node1.getMBR().area() < node2.getMBR().area()) {
+            } else { //draw so check by min getArea
+                if (node1.mbr.getArea() < node2.mbr.getArea()) {
                     node1.addNode(childrenIds.get(index), newRectangle);
-                } else if (node1.getMBR().area() > node2.getMBR().area()) {
+                } else if (node1.mbr.getArea() > node2.mbr.getArea()) {
                     node2.addNode(childrenIds.get(index), newRectangle);
                 } else { //draw so check by min number of MBRs
-                    if (node1.getChildrenIds().size() < node2.getChildrenIds().size()) {
+                    if (node1.childrenIds.size() < node2.childrenIds.size()) {
                         node1.addNode(childrenIds.get(index), newRectangle);
-                    } else if (node1.getChildrenIds().size() > node2.getChildrenIds().size()) {
+                    } else if (node1.childrenIds.size() > node2.childrenIds.size()) {
                         node2.addNode(childrenIds.get(index), newRectangle);
                     } else { //draw so choose ExternalNode1 just because
                         node1.addNode(childrenIds.get(index), newRectangle);
@@ -196,7 +196,7 @@ public class QuadraticSplit implements Split {
 
         }
         // one node has M-m+1
-        if (node1.getChildrenIds().size() == threshold) {
+        if (node1.childrenIds.size() == threshold) {
             for (Rectangle rectangle : rectangles) {
                 node2.addNode(childrenIds.get(rectangles.indexOf(rectangle)), rectangle);
             }
@@ -214,6 +214,6 @@ public class QuadraticSplit implements Split {
         node2.writeToDisk();
         Config.DISK_ACCESSES++;
 
-        return new INode[]{node1, node2};
+        return new AbstractNode[]{node1, node2};
     }
 }
