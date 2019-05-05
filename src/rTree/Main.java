@@ -20,12 +20,10 @@ public class Main {
     public static final String DIR = "data" + File.separator;
 	public static final File FILE = new File(DIR + "id");
 
-    private static final int N = (int) Math.pow(2, 10);
+    private static final int N = (int) Math.pow(2, 14);
 
     public static void main(String[] args) {
     	
-        RTree linearRTree = new RTree(new LinearSplit());
-        RTree quadraticRTree = new RTree(new QuadraticSplit());
         long startTime;
         long endTime;
         List<Rectangle> rectangles = new ArrayList<>();
@@ -46,9 +44,10 @@ public class Main {
          * Linear Split 
          * 
          */
+        RTree linearRTree = new RTree(new LinearSplit());
         // Warm up with N/10
         for (int i = 0; i < (int) N / 10; i++) {
-            linearRTree.insert(rectangles.get(i));
+            linearRTree.insert(rectangles.get(i));            
         }
         linearRTree.clear();
         
@@ -58,12 +57,14 @@ public class Main {
             linearRTree.insert(rectangle);
         }
         endTime = System.currentTimeMillis();
-     
-        System.out.println("Tiempo promedio por inserción con LinearSplit: " + ((endTime - startTime) / (rectangles.size() * 1.0)) + "milisegundos");
+        
+        System.out.println("#### Linear Split ####");
+        System.out.println("Tiempo promedio por inserción con LinearSplit: " + ((endTime - startTime) / (rectangles.size() * 1.0)) + " milisegundos");
         System.out.println("N° total de accesos a disco: " + DISK_ACCESSES);
-        System.out.println("Tiempo total de construcción por inserción con LinearSplit: " + (endTime - startTime) + "milisegundos");
+        System.out.println("Tiempo total de construcción por inserción con LinearSplit: " + (endTime - startTime) + " milisegundos");
         System.out.println("Espacio utilizado en disco: " + linearRTree.getRoot().getDiskUsage());
         System.out.println("Porcentaje de llenado de disco:");
+        System.out.println("");
         
         DISK_ACCESSES = 0;
         
@@ -74,17 +75,17 @@ public class Main {
 			List<Rectangle> resultrect = linearRTree.search(rrectangle);        
         }
         endTime = System.currentTimeMillis();
-        
-        System.out.println("Tiempo promedio por búsqueda con LinearSplit: " + ((endTime - startTime) / (N / 10)) + "milisegundos");
+        System.out.println("Tiempo promedio por búsqueda con LinearSplit: " + ((endTime - startTime) / (N / 10)) + " milisegundos");
         System.out.println("N° total de accesos a disco: " + DISK_ACCESSES);
-        System.out.println("Tiempo total de búsquedas con LinearSplit: " + (endTime - startTime) + "milisegundos");
-        
+        System.out.println("Tiempo total de búsquedas con LinearSplit: " + (endTime - startTime) + " milisegundos");
+        System.out.println("");
         DISK_ACCESSES = 0;
         
         /* 
          * Quadratic Split 
          * 
          */
+        RTree quadraticRTree = new RTree(new QuadraticSplit());
         // Warm up with N/10
         for (int i = 0; i < (int) N / 10; i++) {
             quadraticRTree.insert(rectangles.get(i));
@@ -98,11 +99,13 @@ public class Main {
         }
         endTime = System.currentTimeMillis();
      
-        System.out.println("Tiempo promedio por inserción con QuadraticSplit: " + ((endTime - startTime) / (rectangles.size() * 1.0)) + "milisegundos");
+        System.out.println("#### Quadratic Split ####");
+        System.out.println("Tiempo promedio por inserción con QuadraticSplit: " + ((endTime - startTime) / (rectangles.size() * 1.0)) + " milisegundos");
         System.out.println("N° total de accesos a disco: " + DISK_ACCESSES);
-        System.out.println("Tiempo total de construcción por inserción con QuadraticSplit: " + (endTime - startTime) + "milisegundos");
+        System.out.println("Tiempo total de construcción por inserción con QuadraticSplit: " + (endTime - startTime) + " milisegundos");
         System.out.println("Espacio utilizado en disco: " + quadraticRTree.getRoot().getDiskUsage());
         System.out.println("Porcentaje de llenado de disco:");
+        System.out.println("");
         
         DISK_ACCESSES = 0;
         
@@ -114,9 +117,9 @@ public class Main {
         }
         endTime = System.currentTimeMillis();
         
-        System.out.println("Tiempo promedio por búsqueda con QuadraticSplit: " + ((endTime - startTime) / (N / 10)) + "milisegundos");
+        System.out.println("Tiempo promedio por búsqueda con QuadraticSplit: " + ((endTime - startTime) / (N / 10)) + " milisegundos");
         System.out.println("N° total de accesos a disco: " + DISK_ACCESSES);
-        System.out.println("Tiempo total de búsquedas con QuadraticSplit: " + (endTime - startTime) + "milisegundos");
+        System.out.println("Tiempo total de búsquedas con QuadraticSplit: " + (endTime - startTime) + " milisegundos");
 
     }
     

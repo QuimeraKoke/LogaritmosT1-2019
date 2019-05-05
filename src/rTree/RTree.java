@@ -6,7 +6,6 @@ import rTree.nodes.InternalNode;
 import rTree.nodes.Rectangle;
 import rTree.splits.Split;
 
-import java.io.File;
 import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -21,26 +20,26 @@ public class RTree implements Serializable {
 	private Split heuristic;
 
     private int rootId;
-    public static final String DIR = "data" + File.separator;
 
 
     public RTree(Split heuristic) {
         AbstractNode root = new ExternalNode();
-        rootId = root.newId();
         this.heuristic = heuristic;
+        rootId = root.id;
+        //System.out.println("rootId " + rootId);
         root.writeToDisk();
         Main.DISK_ACCESSES++;
     }
 
     public RTree(Split heuristic, AbstractNode root) {
-        rootId = root.newId();
+        rootId = root.id;
         this.heuristic = heuristic;
         root.writeToDisk();
         Main.DISK_ACCESSES++;
     }
 
     public AbstractNode getRoot() {
-        return AbstractNode.readFromDisk(rootId);
+        return Main.readFromDisk(rootId);
     }
 
     public List<Rectangle> search(Rectangle rectangle) {
@@ -50,7 +49,7 @@ public class RTree implements Serializable {
     private List<Rectangle> searchIn(int nodeId, Rectangle rectangle) {
 
         List<Rectangle> results = new ArrayList<>();
-        AbstractNode node = AbstractNode.readFromDisk(nodeId);
+        AbstractNode node = Main.readFromDisk(nodeId);
         Main.DISK_ACCESSES++;
 
         if (node.mbr.intersects(rectangle)) {
@@ -69,22 +68,25 @@ public class RTree implements Serializable {
     }
 
     public void insert(Rectangle rectangle) {
-
+    	
+    	//System.out.println("insert id " + rootId);
         AbstractNode[] newNodes = insertIn(rootId, rectangle);
         if (newNodes[1] == null) {
             rootId = newNodes[0].id;
+            //System.out.println("rootID insert if " +rootId);
         } else {
             AbstractNode newRoot = new InternalNode(new ArrayList<>(Arrays.asList(newNodes[0].id, newNodes[1].id)),
                     new ArrayList<>(Arrays.asList(newNodes[0].mbr , newNodes[1].mbr)));
             rootId = newRoot.id;
+            //System.out.println("rootID insert else " +rootId);
             newRoot.writeToDisk();
             Main.DISK_ACCESSES++;
         }
     }
 
     private AbstractNode[] insertIn(int nodeId, Rectangle rectangle) {
-
-        AbstractNode node = AbstractNode.readFromDisk(nodeId);
+    	//System.out.println("insertin id " + nodeId);
+        AbstractNode node = Main.readFromDisk(nodeId);
         Main.DISK_ACCESSES++;
 
         // node is a ExternalNode, we just insert
