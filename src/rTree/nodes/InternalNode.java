@@ -1,11 +1,17 @@
 package rTree.nodes;
 
 import java.util.List;
+
+import rTree.Main;
+
 import static rTree.Main.MAX_M;
 
-import rTree.Config;
-
 public class InternalNode extends AbstractNode {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 
 	public InternalNode() {
         super();
@@ -27,10 +33,10 @@ public class InternalNode extends AbstractNode {
     
     @Override
     public double[] getDiskUsage() {
-        double nodeP = (double) (childrenIds.size()) / Config.MAX_M;
+        double nodeP = (double) (childrenIds.size()) / MAX_M;
         double totalNodes = (double) childrenIds.size();
         for (Integer id : childrenIds) {
-            AbstractNode child = readFromDisk(id);
+            AbstractNode child = Main.readFromDisk(id);
             double[] childrenStuff = child.getDiskUsage();
             nodeP += childrenStuff[0];
             totalNodes += childrenStuff[1];
