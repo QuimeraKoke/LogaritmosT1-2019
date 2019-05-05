@@ -6,17 +6,22 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import static rTree.Main.MAX_M;
 import static rTree.Main.MIN_M;
 
-public abstract class AbstractNode {
+public abstract class AbstractNode implements Serializable {
     
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	public static final String DIR = "data" + File.separator;
 	public static final File FILE = new File(DIR + "id");
 	
-	int id;
+	public int id;
 	public Rectangle mbr;
     public List<Integer> childrenIds;
     public List<Rectangle> rectangles;
@@ -32,17 +37,13 @@ public abstract class AbstractNode {
         updateMBR();
     }
 
-    public int getId(){
-        return id;
-    }
-
-    public static int newId() {
+    public int newId() {
         try {
             int result = 0;
             if (FILE.exists()) {
                 FileInputStream fis = new FileInputStream(FILE);
                 ObjectInputStream in = new ObjectInputStream(fis);
-                result = in.read();
+                result = in.readInt();
                 in.close();
             }
             ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(FILE));
@@ -72,19 +73,6 @@ public abstract class AbstractNode {
         return true;
     }
     
-    public static AbstractNode readFromDisk(int id) {
-        try {
-            ObjectInputStream in = new ObjectInputStream(new FileInputStream(DIR + "n" + id + ".node"));
-            AbstractNode noderead = (AbstractNode)in.readObject();
-            in.close();
-            return noderead; 
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.exit(1);
-            return null;
-        }
-    }
-    
     public void writeToDisk() {
         try {
             ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(DIR + "n" + id + ".node"));
@@ -97,7 +85,7 @@ public abstract class AbstractNode {
     }
     
     public double[] getDiskUsage() {
-        return new double[] {(double) (rectangles.size()) / MAX_M, 0};
+        return new double[] {rectangles.size() * 1.0 / MAX_M, 0};
     }
 
     public void addNode(int nodeId, Rectangle rectMBR) {};
