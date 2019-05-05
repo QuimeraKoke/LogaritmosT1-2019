@@ -1,6 +1,7 @@
 package rTree.nodes;
 
 import java.util.List;
+import static rTree.Main.MAX_M;
 
 public class InternalNode extends AbstractNode {
 
