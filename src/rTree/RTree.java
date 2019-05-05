@@ -167,8 +167,8 @@ public class RTree implements Serializable {
         // TODO: FIX PLS
         AbstractNode[] newNodes = new AbstractNode[]{node, null};
         // check if overflow
-        if (node.isOverflow()) {
-            newNodes = heuristic.split(node);
+        if (node.hasOverflow()) {
+            newNodes = node.split(heuristic);
         }
 
         return newNodes;
