@@ -3,7 +3,6 @@ package tests;
 import org.junit.Before;
 import org.junit.Test;
 import rTree.model.*;
-import rTree.model.geometric.IRectangle;
 import rTree.model.geometric.Rectangle;
 import rTree.model.splits.LinearSplit;
 import rTree.model.splits.QuadraticSplit;

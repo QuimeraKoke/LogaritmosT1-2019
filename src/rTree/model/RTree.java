@@ -31,7 +31,7 @@ public class RTree implements Serializable {
         Config.DISK_ACCESSES++;
     }
 
-    public INode getRoot() {
+    public AbstractNode getRoot() {
         return AbstractNode.readFromDisk(rootId);
     }
 
